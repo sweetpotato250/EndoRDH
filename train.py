@@ -43,7 +43,7 @@ if __name__ == '__main__':
     parser.add_argument('--rotation_lr', type=float, default=0.001, help="initial learning rate")
 
 
-    parser.add_argument('--decouple_mode', type=str, default='C')
+    parser.add_argument('--decouple_mode', type=str, default='C)
 
     opt = parser.parse_args()
     print(opt)

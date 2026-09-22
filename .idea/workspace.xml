@@ -5,16 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3a499882-345d-4061-b2c7-e75930c411e0" name="更改" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.name" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.name" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/decoder.zip" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/environment.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/eval_rgb.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gaussian_core/utils.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gaussian_core/watermark_utils.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gen_lesion_mask.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/inference.py" beforeDir="false" afterPath="$PROJECT_DIR$/inference.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/robustness_utils.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gaussian_core/watermark_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/gaussian_core/watermark_utils.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/train.py" beforeDir="false" afterPath="$PROJECT_DIR$/train.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -46,7 +39,7 @@
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
     &quot;last_opened_file_path&quot;: &quot;D:/learn_python/EndoRDH&quot;
   }
 }</component>

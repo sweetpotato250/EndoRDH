@@ -368,29 +368,29 @@ class EndoGSWatermarker:
         z_shifted = z.clone()
 
         current_median = self.saved_peak_A if branch == 'A' else self.saved_peak_B
-
         if current_median is None:
-            current_median = torch.median(z[:, 0:1, :]).item()
+            current_median = float(torch.median(z[:, 0:1, :]).detach().cpu().item())
             if branch == 'A':
                 self.saved_peak_A = current_median
             else:
                 self.saved_peak_B = current_median
 
+        peak_t = torch.as_tensor(current_median, device=z.device, dtype=z.dtype)
+
         msg_expanded = msg_bits.repeat_interleave(self.chunk_size * self.m_repeats)[:z.size(-1)]
         msg_expanded = msg_expanded.view(1, 1, -1)
-
         pad_len = z.size(-1) - msg_expanded.size(-1)
         if pad_len > 0:
-            msg_expanded = torch.cat([msg_expanded, torch.zeros(1, 1, pad_len, device="cuda")], dim=-1)
+            msg_expanded = torch.cat(
+                [msg_expanded, torch.zeros(1, 1, pad_len, device=z.device)], dim=-1
+            )
 
-        # 修复：链式布尔索引返回copy，原地加法不生效；改用 torch.where 直接赋值
+        z_c0 = z_shifted[:, 0:1, :]
         z_shifted[:, 0:1, :] = torch.where(
-            msg_expanded > 0, z_shifted[:, 0:1, :] + self.hs_delta,
-            torch.where(msg_expanded < 0, z_shifted[:, 0:1, :] - self.hs_delta,
-                        z_shifted[:, 0:1, :])
+            msg_expanded > 0, peak_t + self.hs_delta,
+            torch.where(msg_expanded < 0, peak_t - self.hs_delta, z_c0)
         )
         return z_shifted
-
 
     def _apply_differentiable_attacks(self, image):
         attacked = image.clone()
@@ -553,23 +553,26 @@ class EndoGSWatermarker:
 
         # EMA 动态更新 peak（已整合 P0-2，无需再单独改第一处）
         with torch.no_grad():
-            current_peak_A = torch.median(z_A[0, 0, :]).detach()
-            current_peak_B = torch.median(z_B[0, 0, :]).detach()
+            current_peak_A = float(torch.median(z_A[0, 0, :]).detach().cpu().item())
+            current_peak_B = float(torch.median(z_B[0, 0, :]).detach().cpu().item())
             if self.saved_peak_A is None:
                 self.saved_peak_A = current_peak_A
                 self.saved_peak_B = current_peak_B
             else:
                 self.saved_peak_A = 0.99 * self.saved_peak_A + 0.01 * current_peak_A
                 self.saved_peak_B = 0.99 * self.saved_peak_B + 0.01 * current_peak_B
-        peak_A = self.saved_peak_A
-        peak_B = self.saved_peak_B
+        peak_A = self.saved_peak_A  # 现在是 Python float
+        peak_B = self.saved_peak_B  # 现在是 Python float
+
+        peak_A_t = torch.as_tensor(peak_A, device=z_A.device, dtype=z_A.dtype)
+        peak_B_t = torch.as_tensor(peak_B, device=z_B.device, dtype=z_B.dtype)
 
         # 步骤1：手动偏移 z 的第0通道（用 torch.cat 替代 in-place 赋值，避免破坏计算图）
-        z_A_shift_0 = torch.where(msg_expanded > 0, z_A[:, 0:1, :] + self.hs_delta,
-                                  torch.where(msg_expanded < 0, z_A[:, 0:1, :] - self.hs_delta,
+        z_A_shift_0 = torch.where(msg_expanded > 0, peak_A_t + self.hs_delta,
+                                  torch.where(msg_expanded < 0, peak_A_t - self.hs_delta,
                                               z_A[:, 0:1, :]))
-        z_B_shift_0 = torch.where(msg_expanded > 0, z_B[:, 0:1, :] + self.hs_delta,
-                                  torch.where(msg_expanded < 0, z_B[:, 0:1, :] - self.hs_delta,
+        z_B_shift_0 = torch.where(msg_expanded > 0, peak_B_t + self.hs_delta,
+                                  torch.where(msg_expanded < 0, peak_B_t - self.hs_delta,
                                               z_B[:, 0:1, :]))
         if z_A.shape[1] > 1:
             z_A_shift = torch.cat([z_A_shift_0, z_A[:, 1:, :]], dim=1)
@@ -755,13 +758,12 @@ class EndoGSWatermarker:
                     start_idx = (i * self.m_repeats + m) * self.chunk_size
                     end_idx = min(start_idx + self.chunk_size, len(z_c0))
                     chunk = z_c0[start_idx:end_idx]
-                    if len(chunk) == 0: continue
+                    if len(chunk) == 0:
+                        continue
 
-                    dist_pos = torch.abs(chunk - (dyn_peak + self.hs_delta))
-                    dist_neg = torch.abs(chunk - (dyn_peak - self.hs_delta))
-
-                    votes_pos = (dist_pos < dist_neg).sum().item()
-                    votes_neg = (dist_neg <= dist_pos).sum().item()
+                    signs = torch.sign(chunk - dyn_peak)
+                    votes_pos = (signs > 0).sum().item()
+                    votes_neg = (signs < 0).sum().item()
 
                     if votes_pos > votes_neg:
                         bit_votes += 1
