@@ -16,5 +16,5 @@ Experiments on dynamic endoscopic 3DGS scenes show that EndoRDH balances represe
 
 > This repository does not include clinical data, patient-identifiable information, private keys, or third-party model weights unless explicitly stated. Please follow the licenses and ethics requirements of the original datasets and models.
 ## Acknowledgement
-* The codebase is developed based on [3D-GS](https://github.com/graphdeco-inria/gaussian-splatting) (Kerbl et al.), [4D-GS](https://github.com/hustvl/4DGaussians) (Wu et al.), [SuGaR](https://github.com/Anttwo/SuGaR) (Guédon et al.), and [EndoNeRF](https://github.com/med-air/EndoNeRF) (Wang et al.).
+* The codebase is developed based on [EndoGS](https://github.com/HKU-MedAI/EndoGS)(Lingting Zhu et al.), [3D-GS](https://github.com/graphdeco-inria/gaussian-splatting) (Kerbl et al.), [4D-GS](https://github.com/hustvl/4DGaussians) (Wu et al.), [SuGaR](https://github.com/Anttwo/SuGaR) (Guédon et al.), and [EndoNeRF](https://github.com/med-air/EndoNeRF) (Wang et al.).
 
