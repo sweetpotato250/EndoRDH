@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 # EndoGS: Deformable Endoscopic Tissues Reconstruction with Gaussian Splatting
 
 This is the official code for https://arxiv.org/abs/2401.11535.
